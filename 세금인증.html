@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>세금 인증</title>
+<style>
+body{font-family:sans-serif;background:#f1f5f9;margin:0;padding:0;}
+.container{max-width:600px;margin:auto;padding:20px;}
+h1{text-align:center;margin-bottom:20px;}
+textarea,input{width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:1px solid #ccc;}
+button{padding:10px 20px;border:none;background:#6366f1;color:white;border-radius:6px;cursor:pointer;}
+.card{background:white;padding:15px;border-radius:10px;margin-bottom:10px;box-shadow:0 3px 6px rgba(0,0,0,0.1);}
+.card-header{display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>세금 인증</h1>
+<input id="name" type="text" placeholder="이름 (선택)">
+<textarea id="content" placeholder="내용을 입력하세요"></textarea>
+<button onclick="addPost()">작성</button>
+
+<h2>작성된 글</h2>
+<div id="posts"></div>
+</div>
+
+<script>
+let posts = JSON.parse(localStorage.getItem('posts')||'[]');
+
+function renderPosts(){
+    const box = document.getElementById('posts');
+    box.innerHTML='';
+    posts.slice().reverse().forEach((p,i)=>{
+        box.innerHTML+=`<div class="card">
+        <div class="card-header">
+        <strong>${p.name}</strong>
+        <span>${new Date(p.date).toLocaleString()}</span>
+        </div>
+        <p>${p.content}</p>
+        ${p.reply?`<p><strong>답변:</strong> ${p.reply}</p>`:''}
+        </div>`;
+    });
+}
+
+function addPost(){
+    const name=document.getElementById('name').value||'익명';
+    const content=document.getElementById('content').value;
+    if(!content) return alert('내용을 입력하세요');
+    posts.push({name,content,date:new Date(),reply:''});
+    localStorage.setItem('posts',JSON.stringify(posts));
+    document.getElementById('content').value='';
+    renderPosts();
+}
+
+renderPosts();
+</script>
+</body>
+</html>
