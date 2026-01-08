@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>관리자 페이지</title>
+<style>
+body{font-family:sans-serif;background:#f1f5f9;margin:0;padding:0;}
+.container{max-width:600px;margin:auto;padding:20px;}
+h1{text-align:center;margin-bottom:20px;}
+textarea,input{width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:1px solid #ccc;}
+button{padding:5px 10px;border:none;background:#6366f1;color:white;border-radius:6px;cursor:pointer;margin-left:5px;}
+.card{background:white;padding:15px;border-radius:10px;margin-bottom:10px;box-shadow:0 3px 6px rgba(0,0,0,0.1);}
+.card-header{display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>관리자 페이지</h1>
+<button onclick="logout()">로그아웃</button>
+<div id="posts"></div>
+</div>
+
+<script>
+const ADMIN_PASSWORD='0429'; // 변경된 관리자 비밀번호
+let loggedIn = sessionStorage.getItem('admin')==='true';
+
+if(!loggedIn){
+    let pw = prompt('관리자 비밀번호를 입력하세요:');
+    if(pw===ADMIN_PASSWORD){
+        loggedIn=true;
+        sessionStorage.setItem('admin','true');
+    }else{
+        alert('비밀번호 틀림'); location.href='index.html';
+    }
+}
+
+let posts=JSON.parse(localStorage.getItem('posts')||'[]');
+
+function renderPosts(){
+    const box=document.getElementById('posts');
+    box.innerHTML='';
+    posts.slice().reverse().forEach((p,i)=>{
+        let idx=posts.length-1-i;
+        box.innerHTML+=`<div class="card">
+        <div class="card-header">
+        <strong>${p.name}</strong>
+        <span>${new Date(p.date).toLocaleString()}</span>
+        <button onclick="del(${idx})">삭제</button>
+        </div>
+        <p>${p.content}</p>
+        <textarea placeholder="답변 작성" onchange="reply(this,${idx})">${p.reply||''}</textarea>
+        </div>`;
+    });
+}
+
+function del(index){
+    if(confirm('정말 삭제할까요?')){
+        posts.splice(index,1);
+        localStorage.setItem('posts',JSON.stringify(posts));
+        renderPosts();
+    }
+}
+
+function reply(el,index){
+    posts[index].reply=el.value;
+    localStorage.setItem('posts',JSON.stringify(posts));
+}
+
+function logout(){
+    sessionStorage.removeItem('admin');
+    location.href='index.html';
+}
+
+renderPosts();
+</script>
+</body>
+</html>
